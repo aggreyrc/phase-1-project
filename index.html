@@ -6,7 +6,7 @@
     <title>Book MS</title>
     <link rel="icon" href="icons/icons8-books-80.png">
     <script src="./src/index.js" defer></script>
-    <link rel="stylesheet" href="./src/styles.css">
+    <link rel="stylesheet" href="./src/style.css">
 </head>
 <body>
     <h1>Book Management System</h1>
@@ -28,7 +28,10 @@
         </div>
         <div id="Book-container">
             <h2>Books</h2>
-            <input type="text" placeholder="Search Book">
+            <input class="submit" type="text" placeholder="Search Book">
+            <div id="books">
+                <!-- Book cards will be dynamically generated here -->
+            </div>
             <div class="book">
             </div>
         </div>
