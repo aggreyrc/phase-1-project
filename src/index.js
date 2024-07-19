@@ -1,6 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
 
     //Fetching and Adding Books to the DOM
+
     fetch("https://gutendex.com/books/")
     .then(function(response) {
         if(!response.ok){
@@ -30,46 +31,54 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    //Adding Event Listener for search functionality
 
-    let searchBar = document.querySelector(".search-bar");
-    let searchForm = document.querySelector(".submit")
-    searchForm.addEventListener("submit", (e) => {
+    //Searching by author and title
+
+    const form = document.querySelector(".submit");
+    const searchBar = document.querySelector(".search-bar");
+
+    form.addEventListener("submit", (e) => {
         e.preventDefault();
-        const bookId = searchBar.value.trim();
-        if (bookId) {
-            fetch(`https://gutendex.com/books/${bookId}`)
-        .then(function(response) {
-            if(!response.ok){
-                throw new Error(`HTTP Error ${response.status}`)
-            }else{
-                return response.json();
-            }
-        })
-        .then(function(data) {
-            console.log(data);
-            renderBook(data);
-        })
-        .catch(function(error){
-            alert("Books Unavailable");
-            console.log(error);
-        });
-        }else{
-            alert("Enter valid Book Id")
+        const searchQuery = searchBar.value.trim().toLowerCase();
+        if (searchQuery) {
+            fetch(`https://gutendex.com/books?search=${searchQuery}`)
+                .then((response) => response.json())
+                .then((data) => {
+                    renderAuthors(data.results, searchQuery);
+                    searchBar.value = "";
+                })
+                .catch((error) => {
+                    alert("Books Unavailable");
+                    console.log(error);
+                });
         }
     });
 
-    function renderBook(book){
+    function renderAuthors(books, searchQuery) {
         const myBook = document.getElementById("books");
         myBook.innerHTML = "";
-        const bookContainer = document.createElement("div");
-            bookContainer.classList.add("book");
-            bookContainer.innerHTML = `
-            <img src="${book.formats["image/jpeg"]}" alt="${book.title}">
-            <h2>${book.title}</h2>
-            <p>Download: <a href="${book.formats["application/x-mobipocket-ebook"]}" target="_blank">Download</a></p>`;
-            myBook.appendChild(bookContainer);
+        if (books.length === 0) {
+            const noResults = document.createElement("p");
+            noResults.textContent = "No books found matching your search query.";
+            myBook.appendChild(noResults);
+        } else {
+            books.forEach((book) => {
+                const authorNames = book.authors.map((author) => author.name.toLowerCase());
+                const title = book.title.toLowerCase();
+                if (authorNames.includes(searchQuery) || title.includes(searchQuery)) {
+                    const bookContainer = document.createElement("div");
+                    bookContainer.classList.add("book");
+                    bookContainer.innerHTML = `
+                        <img src="${book.formats["image/jpeg"] || 'default-image.jpg'}" alt="${book.title}">
+                        <h2>${book.title}</h2>
+                        <p>Author: ${authorNames.join(', ')}</p>
+                        <p>Download: <a href="${book.formats["application/x-mobipocket-ebook"] || '#'}">Download</a></p>`;
+                    myBook.appendChild(bookContainer);
+                }
+            });
+        }    
     }
+
 
     // Adding Event Listeners to The Categories
 
@@ -95,7 +104,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     fetch(`https://gutendex.com/books/?subjects=${subject}`)
                     .then(response => response.json())
                     .then(data => {
-                            console.log(data)
                             renderSubject(data.results, subject);
                         })
                     .catch(error => {
@@ -120,7 +128,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     subjectContainer.innerHTML = `
                         <img src="${book.formats["image/jpeg"]}" alt="${book.title}">
                         <h2>${book.title}</h2>
-                        <p>Download: <a href="${book.formats["application/x-mobipocket-ebook"]}" target="_blank">Download</a></p>`;
+                        <p>Download: <a href="${book.formats["application/x-mobipocket-ebook"]}">Download</a></p>`;
                         mySubjects.appendChild(subjectContainer);
                 }
             });
