@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", () => {
             booksContainer.innerHTML = `
             <img src="${book.formats["image/jpeg"]}" alt="${book.title}">
             <h2>${book.title}</h2>
-            <p>Download: <a href="${book.formats["application/x-mobipocket-ebook"]}" target="_blank">Download</a></p>`;
+            <p>Download: <a href="${book.formats["application/x-mobipocket-ebook"]}">Download</a></p>`;
             myBooks.appendChild(booksContainer);
         });
     }
@@ -96,7 +96,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     .then(response => response.json())
                     .then(data => {
                             console.log(data)
-                            renderSubject(data.results);
+                            renderSubject(data.results, subject);
                         })
                     .catch(error => {
                             alert("Books Unavailable");
@@ -107,14 +107,14 @@ document.addEventListener("DOMContentLoaded", () => {
             
         })
     }
-     renderSubjects()
+    renderSubjects()
    
-        function renderSubject(books){
+        function renderSubject(books, subject){
             const mySubjects = document.getElementById("books");
             mySubjects.innerHTML = "";
-            books.slice(0, 8).forEach(book =>{
+            books.forEach(book =>{
                 const listElement = document.getElementsByTagName("li");
-                if(book.subjects[0] === listElement.textContent){
+                if(book.subjects[0] === subject){
                     const subjectContainer = document.createElement("div");
                     subjectContainer.classList.add("book");
                     subjectContainer.innerHTML = `
