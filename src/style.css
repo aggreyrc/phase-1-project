@@ -3,7 +3,7 @@ body {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    background-color: #070709;
+    background-color: #b7b7d1;
 }
 
 h1 {
@@ -32,15 +32,16 @@ h1 {
     margin-left: 20%;
 }
 
-#Category ul {
+.Category ul {
     list-style: none;
     padding: 0;
 }
 
-#Category li {
+li {
     padding: 8px;
     border-bottom: 1px solid #ccc;
-    color: #fff;
+    color: #011116;
+    cursor: pointer;
 }
 
 #Book-container {

@@ -10,7 +10,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     })
     .then(function(data) {
-        console.log(data.results);
         renderBooks(data.results);
     })
     .catch(function(error){
@@ -20,34 +19,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function renderBooks(books){
         const myBooks = document.getElementById("books")
-        books.slice(0, 8).forEach(book => {
+        books.slice(0, 12).forEach(book => {
             const booksContainer = document.createElement("div");
             booksContainer.classList.add("book");
-
-           
-            const cover = document.createElement("img");
-            cover.src = book.formats["image/jpeg"];
-            cover.alt = `${book.title}`;
-            booksContainer.appendChild(cover);
-
-            const h2 = document.createElement("h2");
-            h2.textContent = book.title;
-            booksContainer.appendChild(h2);
-
-            const addBtn = document.createElement("button");
-            addBtn.textContent = "Add to Collection";
-            addBtn.className = "Add Button"
-            booksContainer.appendChild(addBtn);
-
-
+            booksContainer.innerHTML = `
+            <img src="${book.formats["image/jpeg"]}" alt="${book.title}">
+            <h2>${book.title}</h2>
+            <p>Download: <a href="${book.formats["application/x-mobipocket-ebook"]}" target="_blank">Download</a></p>`;
             myBooks.appendChild(booksContainer);
         });
     }
 
     //Adding Event Listener for search functionality
 
-    const searchBar = document.querySelector(".search-bar");
-    const searchForm = document.querySelector(".submit")
+    let searchBar = document.querySelector(".search-bar");
+    let searchForm = document.querySelector(".submit")
     searchForm.addEventListener("submit", (e) => {
         e.preventDefault();
         const bookId = searchBar.value.trim();
@@ -78,23 +64,66 @@ document.addEventListener("DOMContentLoaded", () => {
         myBook.innerHTML = "";
         const bookContainer = document.createElement("div");
             bookContainer.classList.add("book");
-
-           
-            const cover = document.createElement("img");
-            cover.src = book.formats["image/jpeg"];
-            cover.alt = `${book.title}`;
-            bookContainer.appendChild(cover);
-
-            const h2 = document.createElement("h2");
-            h2.textContent = book.title;
-            bookContainer.appendChild(h2);
-
-            const addBtn = document.createElement("button");
-            addBtn.textContent = "Add to Collection";
-            addBtn.className = "Add Button"
-            bookContainer.appendChild(addBtn);
-
-
+            bookContainer.innerHTML = `
+            <img src="${book.formats["image/jpeg"]}" alt="${book.title}">
+            <h2>${book.title}</h2>
+            <p>Download: <a href="${book.formats["application/x-mobipocket-ebook"]}" target="_blank">Download</a></p>`;
             myBook.appendChild(bookContainer);
     }
+
+    // Adding Event Listeners to The Categories
+
+    const subjectContainer = document.querySelector(".categories")
+    function renderSubjects(){
+        fetch("https://gutendex.com/books/")
+        .then(response => response.json())
+        .then(function(data) {
+            const books = data.results;
+            books.forEach(book => {
+                const listElement = document.createElement("li")
+                listElement.addEventListener("mouseover", () => {
+                    listElement.style.backgroundColor = "#108bb1";
+                });
+                listElement.addEventListener("mouseout", () => {
+                    listElement.style.backgroundColor = "";
+                });
+                listElement.textContent = book.subjects[0]
+                subjectContainer.appendChild(listElement)
+
+                listElement.addEventListener("click",() => {
+                    const subject = listElement.textContent.trim();
+                    fetch(`https://gutendex.com/books/?subjects=${subject}`)
+                    .then(response => response.json())
+                    .then(data => {
+                            console.log(data)
+                            renderSubject(data.results);
+                        })
+                    .catch(error => {
+                            alert("Books Unavailable");
+                            console.log(error);
+                    });
+                });
+           })
+            
+        })
+    }
+     renderSubjects()
+   
+        function renderSubject(books){
+            const mySubjects = document.getElementById("books");
+            mySubjects.innerHTML = "";
+            books.slice(0, 8).forEach(book =>{
+                const listElement = document.getElementsByTagName("li");
+                if(book.subjects[0] === listElement.textContent){
+                    const subjectContainer = document.createElement("div");
+                    subjectContainer.classList.add("book");
+                    subjectContainer.innerHTML = `
+                        <img src="${book.formats["image/jpeg"]}" alt="${book.title}">
+                        <h2>${book.title}</h2>
+                        <p>Download: <a href="${book.formats["application/x-mobipocket-ebook"]}" target="_blank">Download</a></p>`;
+                        mySubjects.appendChild(subjectContainer);
+                }
+            });
+        
+        }
 });
